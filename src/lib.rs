@@ -15,4 +15,4 @@ pub mod notation;
 pub use ai::{best_move, Difficulty};
 pub use board::{Board, BoardError, Cell, Player, Pos};
 pub use game::{Game, GameError, Status};
-pub use notation::{format_board, parse_board, parse_pos, NotationError};
+pub use notation::{format_board, format_pos, parse_board, parse_moves, parse_pos, render_grid, NotationError};
