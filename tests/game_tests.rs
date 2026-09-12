@@ -76,7 +76,15 @@ fn draw_when_board_fills_without_winner() {
     // X O O
     // O X X
     let moves = [
-        p(0, 0), p(0, 1), p(0, 2), p(1, 1), p(1, 0), p(1, 2), p(2, 1), p(2, 0), p(2, 2),
+        p(0, 0),
+        p(0, 1),
+        p(0, 2),
+        p(1, 1),
+        p(1, 0),
+        p(1, 2),
+        p(2, 1),
+        p(2, 0),
+        p(2, 2),
     ];
     let mut game = Game::new();
     let mut last = Status::InProgress;
@@ -95,7 +103,15 @@ fn winning_on_the_last_cell_is_a_win_not_a_draw() {
     // O X O
     // O X X   <- X completes the diagonal with the ninth move
     let moves = [
-        p(0, 0), p(0, 1), p(0, 2), p(1, 0), p(1, 1), p(1, 2), p(2, 1), p(2, 0), p(2, 2),
+        p(0, 0),
+        p(0, 1),
+        p(0, 2),
+        p(1, 0),
+        p(1, 1),
+        p(1, 2),
+        p(2, 1),
+        p(2, 0),
+        p(2, 2),
     ];
     let game = Game::from_moves(&moves).unwrap();
     assert_eq!(game.status(), Status::Won(Player::X));
@@ -152,7 +168,10 @@ fn from_moves_replays_and_rejects_illegal_sequences() {
 #[test]
 fn game_error_display_is_readable() {
     assert_eq!(GameError::GameOver.to_string(), "the game is already over");
-    assert_eq!(GameError::NothingToUndo.to_string(), "there is no move to undo");
+    assert_eq!(
+        GameError::NothingToUndo.to_string(),
+        "there is no move to undo"
+    );
     assert_eq!(
         GameError::Board(BoardError::OutOfBounds).to_string(),
         "position is outside the 3x3 board"

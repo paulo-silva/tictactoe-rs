@@ -31,9 +31,18 @@ fn empty_board_formats_as_dots() {
 
 #[test]
 fn parse_board_rejects_bad_shapes() {
-    assert!(matches!(parse_board("X.O/.X."), Err(NotationError::BadShape(_))));
-    assert!(matches!(parse_board("X.O/.X./..O/..."), Err(NotationError::BadShape(_))));
-    assert!(matches!(parse_board("X.O/.X../..O"), Err(NotationError::BadShape(_))));
+    assert!(matches!(
+        parse_board("X.O/.X."),
+        Err(NotationError::BadShape(_))
+    ));
+    assert!(matches!(
+        parse_board("X.O/.X./..O/..."),
+        Err(NotationError::BadShape(_))
+    ));
+    assert!(matches!(
+        parse_board("X.O/.X../..O"),
+        Err(NotationError::BadShape(_))
+    ));
     assert!(matches!(parse_board(""), Err(NotationError::BadShape(_))));
 }
 
@@ -46,13 +55,22 @@ fn parse_board_rejects_bad_chars() {
 #[test]
 fn parse_board_rejects_unreachable_counts() {
     // O has more marks than X.
-    assert!(matches!(parse_board("O.O/.X./..."), Err(NotationError::Unreachable(_))));
+    assert!(matches!(
+        parse_board("O.O/.X./..."),
+        Err(NotationError::Unreachable(_))
+    ));
     // X is two ahead of O.
-    assert!(matches!(parse_board("X.X/.X./..O"), Err(NotationError::Unreachable(_))));
+    assert!(matches!(
+        parse_board("X.X/.X./..O"),
+        Err(NotationError::Unreachable(_))
+    ));
     // X one ahead is fine.
     assert!(parse_board("X.X/.O./...").is_ok());
     // Both with three in a row cannot happen.
-    assert!(matches!(parse_board("XXX/OOO/..."), Err(NotationError::Unreachable(_))));
+    assert!(matches!(
+        parse_board("XXX/OOO/..."),
+        Err(NotationError::Unreachable(_))
+    ));
 }
 
 #[test]
@@ -69,7 +87,10 @@ fn parse_pos_accepts_letter_digit_and_single_digit() {
 #[test]
 fn parse_pos_rejects_garbage() {
     for bad in ["", "d1", "a4", "a0", "0", "10", "aa", "1a", "b", "b22"] {
-        assert!(matches!(parse_pos(bad), Err(NotationError::BadPos(_))), "{bad:?}");
+        assert!(
+            matches!(parse_pos(bad), Err(NotationError::BadPos(_))),
+            "{bad:?}"
+        );
     }
 }
 
@@ -103,22 +124,31 @@ fn parse_moves_empty_is_new_game() {
 
 #[test]
 fn parse_moves_reports_bad_positions_and_illegal_play() {
-    assert!(matches!(parse_moves("a1,zz"), Err(NotationError::BadPos(_))));
-    assert!(matches!(parse_moves("a1,a1"), Err(NotationError::Unreachable(_))));
-    assert!(matches!(parse_moves("a1,b1,a2,b2,a3,c3"), Err(NotationError::Unreachable(_))));
+    assert!(matches!(
+        parse_moves("a1,zz"),
+        Err(NotationError::BadPos(_))
+    ));
+    assert!(matches!(
+        parse_moves("a1,a1"),
+        Err(NotationError::Unreachable(_))
+    ));
+    assert!(matches!(
+        parse_moves("a1,b1,a2,b2,a3,c3"),
+        Err(NotationError::Unreachable(_))
+    ));
 }
 
 #[test]
 fn render_grid_matches_documented_layout() {
     let board = parse_board("X.O/.X./..O").unwrap();
-    let expected = "\
-   1   2   3
-a  X | . | O
-  ---+---+---
-b  . | X | .
-  ---+---+---
-c  . | . | O
-";
+    let expected = concat!(
+        "   1   2   3\n",
+        "a  X | . | O\n",
+        "  ---+---+---\n",
+        "b  . | X | .\n",
+        "  ---+---+---\n",
+        "c  . | . | O\n",
+    );
     assert_eq!(render_grid(&board), expected);
 }
 
@@ -128,8 +158,14 @@ fn notation_error_display_is_readable() {
         NotationError::BadShape("expected 3 rows".into()).to_string(),
         "invalid board: expected 3 rows"
     );
-    assert_eq!(NotationError::BadChar('Z').to_string(), "invalid character 'Z'");
-    assert_eq!(NotationError::BadPos("d1".into()).to_string(), "invalid position \"d1\"");
+    assert_eq!(
+        NotationError::BadChar('Z').to_string(),
+        "invalid character 'Z'"
+    );
+    assert_eq!(
+        NotationError::BadPos("d1".into()).to_string(),
+        "invalid position \"d1\""
+    );
     assert_eq!(
         NotationError::Unreachable("O has more marks than X".into()).to_string(),
         "unreachable board: O has more marks than X"

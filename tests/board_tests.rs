@@ -60,7 +60,10 @@ fn placing_on_occupied_cell_fails_and_leaves_board_unchanged() {
     let mut board = Board::new();
     board.place(p(0, 0), Player::X).unwrap();
     let before = board.clone();
-    assert_eq!(board.place(p(0, 0), Player::O), Err(BoardError::Occupied(p(0, 0))));
+    assert_eq!(
+        board.place(p(0, 0), Player::O),
+        Err(BoardError::Occupied(p(0, 0)))
+    );
     assert_eq!(board, before);
 }
 
@@ -176,11 +179,20 @@ fn winning_line_prefers_rows_then_columns_then_diagonals() {
     // X wins on both the top row and the left column; the row is reported.
     let board = fill([X, X, X, X, O, O, X, E, E]);
     let line = board.winning_line().unwrap();
-    assert_eq!([line[0].index(), line[1].index(), line[2].index()], [0, 1, 2]);
+    assert_eq!(
+        [line[0].index(), line[1].index(), line[2].index()],
+        [0, 1, 2]
+    );
 }
 
 #[test]
 fn board_error_display_is_readable() {
-    assert_eq!(BoardError::OutOfBounds.to_string(), "position is outside the 3x3 board");
-    assert_eq!(BoardError::Occupied(p(1, 2)).to_string(), "cell b3 is already occupied");
+    assert_eq!(
+        BoardError::OutOfBounds.to_string(),
+        "position is outside the 3x3 board"
+    );
+    assert_eq!(
+        BoardError::Occupied(p(1, 2)).to_string(),
+        "cell b3 is already occupied"
+    );
 }

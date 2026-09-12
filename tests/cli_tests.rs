@@ -9,7 +9,12 @@ fn run(args: &[&str], stdin: &str) -> Output {
         .stderr(Stdio::piped())
         .spawn()
         .expect("binary runs");
-    child.stdin.take().unwrap().write_all(stdin.as_bytes()).unwrap();
+    child
+        .stdin
+        .take()
+        .unwrap()
+        .write_all(stdin.as_bytes())
+        .unwrap();
     child.wait_with_output().unwrap()
 }
 
@@ -69,8 +74,15 @@ fn best_prints_recommended_move() {
     let out = run(&["--best", "a1,b1,a2,b2"], "");
     assert!(out.status.success(), "{}", stderr(&out));
     assert_eq!(stdout(&out).trim_end(), "a3");
-    let out = run(&["--best", "--easy", "a1,b2"], "");
+    let out = run(&["--easy", "--best", "a1,b2"], "");
     assert_eq!(stdout(&out).trim_end(), "a2");
+}
+
+#[test]
+fn flag_where_value_expected_exits_two() {
+    let out = run(&["--best", "--easy"], "");
+    assert_eq!(out.status.code(), Some(2));
+    assert!(stderr(&out).contains("--best"));
 }
 
 #[test]

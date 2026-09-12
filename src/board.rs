@@ -12,13 +12,19 @@ pub enum Player {
 impl Player {
     /// The opponent of this player.
     pub fn other(self) -> Player {
-        todo!()
+        match self {
+            Player::X => Player::O,
+            Player::O => Player::X,
+        }
     }
 }
 
 impl fmt::Display for Player {
-    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        todo!()
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Player::X => f.write_str("X"),
+            Player::O => f.write_str("O"),
+        }
     }
 }
 
@@ -34,26 +40,37 @@ pub struct Pos {
 
 impl Pos {
     /// Builds a position, rejecting anything outside the 3x3 grid.
-    pub fn new(_row: u8, _col: u8) -> Result<Pos, BoardError> {
-        todo!()
+    pub fn new(row: u8, col: u8) -> Result<Pos, BoardError> {
+        if row < 3 && col < 3 {
+            Ok(Pos { row, col })
+        } else {
+            Err(BoardError::OutOfBounds)
+        }
     }
 
     /// Builds a position from a linear index `0..9` (row-major).
-    pub fn from_index(_index: usize) -> Result<Pos, BoardError> {
-        todo!()
+    pub fn from_index(index: usize) -> Result<Pos, BoardError> {
+        if index < 9 {
+            Ok(Pos {
+                row: (index / 3) as u8,
+                col: (index % 3) as u8,
+            })
+        } else {
+            Err(BoardError::OutOfBounds)
+        }
     }
 
     pub fn row(self) -> u8 {
-        todo!()
+        self.row
     }
 
     pub fn col(self) -> u8 {
-        todo!()
+        self.col
     }
 
     /// Row-major linear index in `0..9`.
     pub fn index(self) -> usize {
-        todo!()
+        self.row as usize * 3 + self.col as usize
     }
 }
 
@@ -67,8 +84,15 @@ pub enum BoardError {
 }
 
 impl fmt::Display for BoardError {
-    fn fmt(&self, _f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        todo!()
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            BoardError::OutOfBounds => f.write_str("position is outside the 3x3 board"),
+            BoardError::Occupied(pos) => write!(
+                f,
+                "cell {} is already occupied",
+                crate::notation::format_pos(*pos)
+            ),
+        }
     }
 }
 
@@ -80,55 +104,79 @@ pub struct Board {
     cells: [Cell; 9],
 }
 
+const LINES: [[usize; 3]; 8] = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+];
+
 impl Board {
     /// An empty board.
     pub fn new() -> Board {
-        todo!()
+        Board { cells: [None; 9] }
     }
 
     /// The cell at `pos`.
-    pub fn get(&self, _pos: Pos) -> Cell {
-        todo!()
+    pub fn get(&self, pos: Pos) -> Cell {
+        self.cells[pos.index()]
     }
 
     /// Places `player` at `pos`. Fails if the cell is occupied.
-    pub fn place(&mut self, _pos: Pos, _player: Player) -> Result<(), BoardError> {
-        todo!()
+    pub fn place(&mut self, pos: Pos, player: Player) -> Result<(), BoardError> {
+        let cell = &mut self.cells[pos.index()];
+        if cell.is_some() {
+            return Err(BoardError::Occupied(pos));
+        }
+        *cell = Some(player);
+        Ok(())
     }
 
     /// Clears the cell at `pos`. Returns the previous occupant.
-    pub fn clear(&mut self, _pos: Pos) -> Cell {
-        todo!()
+    pub fn clear(&mut self, pos: Pos) -> Cell {
+        self.cells[pos.index()].take()
     }
 
     /// True when no cell is empty.
     pub fn is_full(&self) -> bool {
-        todo!()
+        self.cells.iter().all(Option::is_some)
     }
 
     /// Number of occupied cells.
     pub fn count(&self) -> usize {
-        todo!()
+        self.cells.iter().filter(|c| c.is_some()).count()
     }
 
     /// All empty positions in row-major order.
     pub fn empty_positions(&self) -> Vec<Pos> {
-        todo!()
+        self.cells
+            .iter()
+            .enumerate()
+            .filter(|(_, c)| c.is_none())
+            .map(|(i, _)| Pos::from_index(i).expect("index within board"))
+            .collect()
     }
 
     /// The player with three in a row, if any.
     pub fn winner(&self) -> Option<Player> {
-        todo!()
+        self.winning_line().and_then(|line| self.get(line[0]))
     }
 
     /// The first completed line found, in the fixed scan order:
     /// rows top to bottom, columns left to right, main diagonal, anti-diagonal.
     pub fn winning_line(&self) -> Option<[Pos; 3]> {
-        todo!()
+        Board::lines().into_iter().find(|line| {
+            let first = self.get(line[0]);
+            first.is_some() && self.get(line[1]) == first && self.get(line[2]) == first
+        })
     }
 
     /// The eight lines (rows, columns, diagonals) in the scan order above.
     pub fn lines() -> [[Pos; 3]; 8] {
-        todo!()
+        LINES.map(|line| line.map(|i| Pos::from_index(i).expect("index within board")))
     }
 }

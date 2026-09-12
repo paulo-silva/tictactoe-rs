@@ -75,10 +75,10 @@ fn evaluate_scores_forced_outcomes_with_depth() {
 
     // O to move, X has two open threats: O loses in 2 plies: -10 + 2.
     // X . X
-    // . X .
-    // O O .   -> O must block one of a2 / c3, X wins on the other.
+    // O X .
+    // . . O   -> O must block one of a2 / c1, X wins on the other.
     let mut game = Game::new();
-    for pos in [p(0, 0), p(2, 0), p(0, 2), p(2, 1), p(1, 1)] {
+    for pos in [p(0, 0), p(1, 0), p(0, 2), p(2, 2), p(1, 1)] {
         game.play(pos).unwrap();
     }
     assert_eq!(game.current_player(), Player::O);
@@ -101,7 +101,10 @@ fn perfect_ai_never_loses_against_every_first_move() {
         let mut game = Game::new();
         game.play(Pos::from_index(first).unwrap()).unwrap();
         let score = evaluate(&game);
-        assert!(score >= 0, "O should not be lost after X plays {first}, got {score}");
+        assert!(
+            score >= 0,
+            "O should not be lost after X plays {first}, got {score}"
+        );
     }
 }
 
