@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 license = "MIT"
 description = "A test-driven tic-tac-toe engine with a minimax AI and a native CLI"
-repository = "https://github.com/psilva/tictactoe-rs"
+repository = "https://github.com/paulo-silva/tictactoe-rs"
 
 [lib]
 name = "tictactoe"

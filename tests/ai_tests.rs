@@ -1,5 +1,5 @@
 use tictactoe::ai::evaluate;
-use tictactoe::{best_move, parse_board, parse_moves, Difficulty, Game, Player, Pos, Status};
+use tictactoe::{best_move, format_board, parse_moves, Difficulty, Game, Player, Pos, Status};
 
 fn p(row: u8, col: u8) -> Pos {
     Pos::new(row, col).unwrap()
@@ -120,22 +120,11 @@ fn perfect_ai_self_play_always_draws() {
 
 #[test]
 fn tie_breaking_is_lowest_index() {
-    // Two winning moves for X: a3 (index 2) and c1 (index 6). Lowest index wins.
     // X X .
-    // X O .
-    // . O .   wait, that board has O twice and X three times -> X to move is wrong.
-    // Use a parsed board with equal counts: O to move with two wins available.
-    // O O .
-    // X X .
-    // X . O   -> counts X:3 O:3; not reachable with O to move. Use X instead:
-    // X X .
-    // O O .
-    // X . O   -> X:3 O:3? no. Keep it simple with moves.
-    let game = parse_moves("a1,b1,a2,b2,c1,c3").unwrap();
-    // X X .
-    // O O .
-    // X . O   X to move: a3 (index 2) wins; c1 is taken. So choose a2->a3 only.
+    // . O O
+    // X O .   X to move: a3 (index 2) and b1 (index 3) both win. Lowest index wins.
+    let game = parse_moves("a1,b2,a2,b3,c1,c2").unwrap();
+    assert_eq!(format_board(game.board()), "XX./.OO/XO.");
+    assert_eq!(game.current_player(), Player::X);
     assert_eq!(best_move(&game, Difficulty::Perfect), Some(p(0, 2)));
-    let board = parse_board("XX./OO./X.O").unwrap();
-    assert_eq!(board.winner(), None);
 }
